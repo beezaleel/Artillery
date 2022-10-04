@@ -1,6 +1,9 @@
 #include "ArtilleryGame.h"
 #include <iostream>			// cout
 #include "AssetInfo.h"
+#include <cstdlib>
+#include <ctime>
+#include <math.h>
 
 #define DEBUG_LOG_ENABLED
 #ifdef DEBUG_LOG_ENABLED
@@ -8,6 +11,11 @@
 #else
 #define DEBUG_PRINT(x)
 #endif
+
+#define BOUNDARY -20
+
+static bool seeded = false;
+glm::vec3 aimCoordinate;
 
 // Ids preloaded in the main.cpp to be referenced when
 // creating specific game objects for your game.
@@ -56,10 +64,13 @@ void ArtilleryGame::Initialize()
 	m_PlayerTank = CreateGameObjectByType("Player");
 	m_EnemyTank = CreateGameObjectByType("Enemy");
 	m_Bullet = CreateGameObjectByType("Bullet");
+	
+	glm::vec3 playerPosition = InitializePlayersPosition("Player");
+	m_PlayerTank->Position = playerPosition;
+	m_EnemyTank->Position = InitializePlayersPosition("Enemy");
 
-	m_PlayerTank->Position = glm::vec3(-10, 0, -10);
-	m_EnemyTank->Position = glm::vec3(10, 0, 10);
-	m_Bullet->Position = glm::vec3(10, 2, 0);
+	// Bullet position will be the same as player's position
+	m_Bullet->Position = playerPosition;
 }
 
 /// <summary>
@@ -101,7 +112,44 @@ void ArtilleryGame::StartNewGame()
 void ArtilleryGame::GameUpdate()
 {
 	// DEBUG_PRINT("ArtilleryGame::GameUpdate\n");
-	// TODO:
+	if (GDP_IsKeyPressed('w') || GDP_IsKeyPressed('w')) {
+		DEBUG_PRINT("Key w is pressed.\n");
+		UpdateCoordinate(0, 1, 0);
+	}
+	if (GDP_IsKeyPressed('a') || GDP_IsKeyPressed('A')) {
+		DEBUG_PRINT("Key A is pressed.\n");
+		UpdateCoordinate(1, 0, 0);
+	}
+	if (GDP_IsKeyPressed('s') || GDP_IsKeyPressed('S')) {
+		DEBUG_PRINT("Key S is pressed.\n");
+		UpdateCoordinate(0, -1, 0);
+	}
+	if (GDP_IsKeyPressed('d') || GDP_IsKeyPressed('D')) {
+		DEBUG_PRINT("Key D is pressed.\n");
+		UpdateCoordinate(-1, 0, 0);
+	}
+	if (GDP_IsKeyPressed('1')) {
+		DEBUG_PRINT("Key 1 is pressed.\n");
+	}
+	if (GDP_IsKeyPressed('2')) {
+		DEBUG_PRINT("Key 2 is pressed.\n");
+	}
+	if (GDP_IsKeyPressed('3')) {
+		DEBUG_PRINT("Key 3 is pressed.\n");
+	}
+	if (GDP_IsKeyPressed('4')) {
+		DEBUG_PRINT("Key 4 is pressed.\n");
+	}
+	if (GDP_IsKeyPressed('5')) {
+		DEBUG_PRINT("Key 5 is pressed.\n");
+	}
+	if (GDP_IsKeyPressed(' ')) {
+		DEBUG_PRINT("Key spacebar is pressed.\n");
+		DEBUG_PRINT("Aimed coordinate is - (%.2f, %.2f, %.2f)\n", aimCoordinate.x, aimCoordinate.y, aimCoordinate.z);
+	}
+	if (GDP_IsKeyPressed('n') || GDP_IsKeyPressed('N')) {
+		DEBUG_PRINT("Key N is pressed.\n");
+	}
 }
 
 /// <summary>
@@ -145,4 +193,55 @@ GameObject* ArtilleryGame::CreateGameObjectByType(const std::string& type)
 
 	// Invalid game object type, return nullptr
 	return nullptr;
+}
+
+/// <summary>
+/// Initialize start position for Player and Enemy by randomly generating x and z.
+/// Set to (0, 0, 0) if type is unknown.
+/// </summary>
+/// <param name="type">The player type (Player | Enemy)</param>
+/// <returns>Vec3 position</returns>
+glm::vec3 ArtilleryGame::InitializePlayersPosition(const std::string type) {
+	glm::vec3 position;
+	int xPosition, zPosition;
+
+	
+	if (type == "Player") {
+		xPosition = GenerateRandomNumber(BOUNDARY) + (BOUNDARY + 1);
+		zPosition = GenerateRandomNumber(BOUNDARY) + (BOUNDARY + 1);
+		position = glm::vec3(xPosition, 0, zPosition);
+		DEBUG_PRINT("Generated vec3(%d, 0, %d) as initial position for %s\n", xPosition, zPosition, type.c_str());
+	}
+	else if (type == "Enemy") {
+		xPosition = GenerateRandomNumber(abs(BOUNDARY));
+		zPosition = GenerateRandomNumber(abs(BOUNDARY));
+		position = glm::vec3(xPosition, 0, zPosition);
+		DEBUG_PRINT("Generated vec3(%d, 0, %d) as initial position for %s\n", xPosition, zPosition, type.c_str());
+	}
+	else {
+		position = glm::vec3(0, 0, 0);
+	}
+
+	return position;
+}
+
+/// <summary>
+/// Generates a random number between 0 and maxLimit.
+/// </summary>
+/// <param name="maxLimit">The maximum limit</param>
+/// <returns>The generated integer</returns>
+int ArtilleryGame::GenerateRandomNumber(int maxLimit) {
+	if (!seeded) {
+		srand(time(0));
+		seeded = true;
+	}
+
+	return rand() % (maxLimit - 0) + 0;
+}
+
+void ArtilleryGame::UpdateCoordinate(float x, float y, float z) {
+	aimCoordinate = glm::normalize(aimCoordinate + glm::vec3(x, y, z) * 0.01f);
+	m_Bullet->Position = aimCoordinate;
+
+	DEBUG_PRINT("Aimed coordinate is - (%.2f, %.2f, %.2f)\n", aimCoordinate.x, aimCoordinate.y, aimCoordinate.z);
 }
