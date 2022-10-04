@@ -4,7 +4,7 @@ using namespace gdp;
 
 #define SUCCESS 0
 
-const char* WINDOW_TITLE = "Artillery (Clone)";
+const char* WINDOW_TITLE = "Artillery ";
 const int WINDOW_WIDTH = 1200;
 const int WINDOW_HEIGHT = 800;
 
