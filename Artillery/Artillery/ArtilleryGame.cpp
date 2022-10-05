@@ -80,7 +80,23 @@ void ArtilleryGame::Initialize()
 void ArtilleryGame::Destroy()
 {
 	DEBUG_PRINT("ArtilleryGame::Destroy\n");
-	// TODO:
+	m_PlayerTank->Position = { 0, 0, 0 };
+	m_PlayerTank->Renderer.MaterialId = 0;
+	m_PlayerTank->Renderer.MeshId = 0;
+	m_PlayerTank->Renderer.ShaderId = 0;
+	m_PlayerTank->Scale = { 0, 0, 0 };
+
+	m_EnemyTank->Position = { 0, 0, 0 };
+	m_EnemyTank->Renderer.MaterialId = 0;
+	m_EnemyTank->Renderer.MeshId = 0;
+	m_EnemyTank->Renderer.ShaderId = 0;
+	m_EnemyTank->Scale = { 0, 0, 0 };
+
+	m_Bullet->Position = { 0, 0, 0 };
+	m_Bullet->Renderer.MaterialId = 0;
+	m_Bullet->Renderer.MeshId = 0;
+	m_Bullet->Renderer.ShaderId = 0;
+	m_Bullet->Scale = { 0, 0, 0 };
 }
 
 /// <summary>
@@ -94,7 +110,10 @@ void ArtilleryGame::Destroy()
 void ArtilleryGame::StartNewGame()
 {
 	DEBUG_PRINT("ArtilleryGame::StartNewGame\n");
-	// TODO:
+	seeded = false;
+	aimCoordinate = glm::vec3(0, 0, 0);
+
+	Initialize();
 }
 
 /// <summary>
@@ -149,6 +168,8 @@ void ArtilleryGame::GameUpdate()
 	}
 	if (GDP_IsKeyPressed('n') || GDP_IsKeyPressed('N')) {
 		DEBUG_PRINT("Key N is pressed.\n");
+		Destroy();
+		StartNewGame();
 	}
 }
 
