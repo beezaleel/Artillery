@@ -207,14 +207,14 @@ glm::vec3 ArtilleryGame::InitializePlayersPosition(const std::string type) {
 
 	
 	if (type == "Player") {
-		xPosition = GenerateRandomNumber(BOUNDARY) + (BOUNDARY + 1);
-		zPosition = GenerateRandomNumber(BOUNDARY) + (BOUNDARY + 1);
+		xPosition = GenerateRandomNumber(BOUNDARY, abs(BOUNDARY));
+		zPosition = GenerateRandomNumber(BOUNDARY, 0);
 		position = glm::vec3(xPosition, 0, zPosition);
 		DEBUG_PRINT("Generated vec3(%d, 0, %d) as initial position for %s\n", xPosition, zPosition, type.c_str());
 	}
 	else if (type == "Enemy") {
-		xPosition = GenerateRandomNumber(abs(BOUNDARY));
-		zPosition = GenerateRandomNumber(abs(BOUNDARY));
+		xPosition = GenerateRandomNumber(BOUNDARY, abs(BOUNDARY));
+		zPosition = GenerateRandomNumber(0, abs(BOUNDARY));
 		position = glm::vec3(xPosition, 0, zPosition);
 		DEBUG_PRINT("Generated vec3(%d, 0, %d) as initial position for %s\n", xPosition, zPosition, type.c_str());
 	}
@@ -228,15 +228,16 @@ glm::vec3 ArtilleryGame::InitializePlayersPosition(const std::string type) {
 /// <summary>
 /// Generates a random number between 0 and maxLimit.
 /// </summary>
+/// <param name="minLimit">The minimum limit</param>
 /// <param name="maxLimit">The maximum limit</param>
 /// <returns>The generated integer</returns>
-int ArtilleryGame::GenerateRandomNumber(int maxLimit) {
+int ArtilleryGame::GenerateRandomNumber(int minLimit, int maxLimit) {
 	if (!seeded) {
 		srand(time(0));
 		seeded = true;
 	}
 
-	return rand() % (maxLimit - 0) + 0;
+	return rand() % (maxLimit - minLimit) + minLimit;
 }
 
 void ArtilleryGame::UpdateCoordinate(float x, float y, float z) {

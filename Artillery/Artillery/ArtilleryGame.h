@@ -20,7 +20,7 @@ public:
 private:
 	GameObject* CreateGameObjectByType(const std::string& type);
 	glm::vec3 InitializePlayersPosition(const std::string type);
-	int GenerateRandomNumber(int maxLimit);
+	int GenerateRandomNumber(int minLimit, int maxLimit);
 	void UpdateCoordinate(float x, float y, float z);
 
 	GameObject* m_PlayerTank;
