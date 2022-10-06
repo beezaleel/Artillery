@@ -17,3 +17,9 @@ void Particle::Integrate(float dt) {
 	velocity *= damping;
 	position.addScaledVector(velocity, dt);
 }
+
+void Particle::PrintInfo() {
+	std::cout << "-----------------\n";
+	std::cout << "Velocity(" << velocity.x << ", " << velocity.y << ", " << velocity.z << ")\n";
+	std::cout << "Position(" << position.x << ", " << position.y << ", " << position.z << ")\n";
+}

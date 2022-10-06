@@ -2,6 +2,7 @@
 
 #include <gdp/Engine.h>
 #include <string>
+#include "Particle.h"
 
 using namespace gdp; 
 
@@ -22,8 +23,10 @@ private:
 	glm::vec3 InitializePlayersPosition(const std::string type);
 	int GenerateRandomNumber(int minLimit, int maxLimit);
 	void UpdateCoordinate(float x, float y, float z);
+	void Shoot();
+	void DetectHit();
 
 	GameObject* m_PlayerTank;
 	GameObject* m_EnemyTank;
-	GameObject* m_Bullet;
+	Particle* m_Bullet;
 };
