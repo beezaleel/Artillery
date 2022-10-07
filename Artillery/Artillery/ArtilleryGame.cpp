@@ -71,6 +71,17 @@ void ArtilleryGame::Initialize()
 	glm::vec3 playerPosition = InitializePlayersPosition("Player");
 	m_PlayerTank->Position = playerPosition;
 	m_EnemyTank->Position = InitializePlayersPosition("Enemy");
+
+	// Creating and pusing the first bullet.
+	Particle* bullet = new Particle();
+	bullet->gameObject = CreateGameObjectByType("Bullet");
+	bullet->velocity = Vector3(0.0f, 0.0f, 5.0f);
+	bullet->acceleration = Vector3(0.0f, -0.981f, 0.0f);
+	bullet->mass = 1.0f;
+	bullet->damping = 1.0f;
+
+	m_Bullets.push_back(bullet);
+	DisplayTextToUser("Using default projectile...");
 }
 
 /// <summary>
@@ -153,7 +164,7 @@ void ArtilleryGame::GameUpdate()
 	
 	if (GDP_IsKeyPressed('1')) {
 		Vector3 velocity = Vector3(0.0f, 0.0f, 35.0f);
-		Vector3 acceleration = Vector3(0.0f, -1.f, 0.0f);
+		Vector3 acceleration = Vector3(0.0f, -1.235f, 0.0f);
 		ChangeProjectileType(1, 2.0f, velocity, 1.0f, acceleration);
 		DisplayTextToUser("Changing projectile type to PISTOL...");
 	}
@@ -177,18 +188,11 @@ void ArtilleryGame::GameUpdate()
 	}
 	if (GDP_IsKeyPressed('5')) {
 		Vector3 velocity = Vector3(0.0f, 40.0f, 60.0f);
-		Vector3 acceleration = Vector3(0.0f, -0.8f, 0.0f);
+		Vector3 acceleration = Vector3(0.0f, -0.734f, 0.0f);
 		ChangeProjectileType(1, 400.0f, velocity, 1.0f, acceleration);
 		DisplayTextToUser("Changing projectile type to ROCKET LAUNCHER...");
 	}
 	if (GDP_IsKeyPressed(' ')) {
-		// This means no projectile type was selected. Create default projectile.
-		if (m_Bullets.size() == 0) {
-			Vector3 velocity = Vector3(0.0f, 0.0f, 5.0f);
-			Vector3 acceleration = Vector3(0.0f, -0.981f, 0.0f);
-			ChangeProjectileType(1, 1, velocity, 1.0f, acceleration);
-			DisplayTextToUser("Using default projectile...");
-		}
 		DEBUG_PRINT("Aimed coordinate is - (%.2f, %.2f, %.2f)\n", aimCoordinate.x, aimCoordinate.y, aimCoordinate.z);
 		Shoot();
 	}
