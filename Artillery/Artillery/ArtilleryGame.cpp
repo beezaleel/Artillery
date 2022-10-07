@@ -197,7 +197,7 @@ void ArtilleryGame::GameUpdate()
 		DEBUG_PRINT("Aimed coordinate is - (%.2f, %.2f, %.2f)\n", aimCoordinate.x, aimCoordinate.y, aimCoordinate.z);
 		Shoot();
 	}
-	if (GDP_IsKeyPressed('n') || GDP_IsKeyPressed('N')) {
+	if ((GDP_IsKeyPressed('n') && isGameOver) || (isGameOver && GDP_IsKeyPressed('N'))) {
 		Destroy();
 		StartNewGame();
 	}
