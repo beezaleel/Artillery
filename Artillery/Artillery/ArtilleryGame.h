@@ -25,7 +25,7 @@ private:
 	int GenerateRandomNumber(int minLimit, int maxLimit);
 	void UpdateCoordinate(float x, float y, float z);
 	void Shoot();
-	void DetectHit();
+	void Collision();
 	void ChangeProjectileType(unsigned int bulletRounds, 
 		float mass, Vector3 velocity, float damping, 
 		Vector3 acceleration);

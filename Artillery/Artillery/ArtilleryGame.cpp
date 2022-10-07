@@ -16,8 +16,8 @@
 
 #define BOUNDARY -20
 
-bool shooting;
-bool gameOver;
+bool isShooting;
+bool isGameOver;
 static bool seeded = false;
 glm::vec3 aimCoordinate;
 
@@ -110,8 +110,8 @@ void ArtilleryGame::StartNewGame()
 {
 	DEBUG_PRINT("ArtilleryGame::StartNewGame\n");
 	seeded = false;
-	shooting = false;
-	gameOver = false;
+	isShooting = false;
+	isGameOver = false;
 	aimCoordinate = glm::vec3(0, 0, 0);
 
 	Initialize();
@@ -197,13 +197,13 @@ void ArtilleryGame::GameUpdate()
 		StartNewGame();
 	}
 
-	if (shooting) {
+	if (isShooting) {
 		for (int i = 0; i < m_Bullets.size(); i++) {
 			m_Bullets[i]->Integrate(0.005f);
 
 			if (m_Bullets[i]->gameObject->Position.y <= 0.0f) {
-				DetectHit();
-				shooting = false;
+				Collision();
+				isShooting = false;
 			}
 		}
 	}
@@ -218,6 +218,11 @@ void ArtilleryGame::DisplayTextToUser(const std::string& text)
 	std::cout << text << "\n";
 }
 
+/// <summary>
+/// Creates a new Game object based on type name
+/// </summary>
+/// <param name="type">The name of type to create</param>
+/// <returns></returns>
 GameObject* ArtilleryGame::CreateGameObjectByType(const std::string& type)
 {
 	DEBUG_PRINT("ArtilleryGame::CreateGameObjectByType(%s)\n", type.c_str());
@@ -261,7 +266,6 @@ GameObject* ArtilleryGame::CreateGameObjectByType(const std::string& type)
 glm::vec3 ArtilleryGame::InitializePlayersPosition(const std::string type) {
 	glm::vec3 position;
 	int xPosition, zPosition;
-
 	
 	if (type == "Enemy") {
 		xPosition = GenerateRandomNumber(BOUNDARY, abs(BOUNDARY));
@@ -278,7 +282,6 @@ glm::vec3 ArtilleryGame::InitializePlayersPosition(const std::string type) {
 	else {
 		position = glm::vec3(0, 0, 0);
 	}
-
 	return position;
 }
 
@@ -293,37 +296,46 @@ int ArtilleryGame::GenerateRandomNumber(int minLimit, int maxLimit) {
 		srand(time(0));
 		seeded = true;
 	}
-
 	return rand() % (maxLimit - minLimit) + minLimit;
 }
 
+/// <summary>
+/// Update the target coordinate
+/// </summary>
+/// <param name="x">x axis</param>
+/// <param name="y">y axis</param>
+/// <param name="z">z axis</param>
 void ArtilleryGame::UpdateCoordinate(float x, float y, float z) {
 	for (int i = 0; i < m_Bullets.size(); i++) {
 		aimCoordinate = glm::normalize(aimCoordinate + glm::vec3(x, y, z) * 0.01f);
 		m_Bullets[i]->gameObject->Position = aimCoordinate;
 	}
-
 	DEBUG_PRINT("Aimed coordinates: (%.2f, %.2f, %.2f)\n", aimCoordinate.x, aimCoordinate.y, aimCoordinate.z);
 }
 
+/// <summary>
+/// Shoot when the spacebar key is pressed. Involves updating the position and velocity of the particles
+/// </summary>
 void ArtilleryGame::Shoot() {
-	if (shooting)
+	if (isShooting)
 		return;
 
 	for (int i = 0; i < m_Bullets.size(); i++) {
 		m_Bullets[i]->gameObject->Position = m_PlayerTank->Position + glm::vec3(0.0f, 1.0f, 0.0f);
 		m_Bullets[i]->velocity = Vector3(aimCoordinate.x, aimCoordinate.y, aimCoordinate.z) * 6.0f;
 	}
-
-	shooting = true;
+	isShooting = true;
 }
 
-void ArtilleryGame::DetectHit() {
+/// <summary>
+/// Detect if the bullet has hit target. Calculate distance between bullet and target.
+/// </summary>
+void ArtilleryGame::Collision() {
 	for (int i = 0; i < m_Bullets.size(); i++) {
 		float distance = glm::distance(m_Bullets[i]->gameObject->Position, m_EnemyTank->Position);
 		if (distance < 1.5f) {
 			DisplayTextToUser("Enemy eliminated!. Please press `n` to start a new game.\n");
-			gameOver = true;
+			isGameOver = true;
 			return;
 		}
 		else
@@ -333,6 +345,14 @@ void ArtilleryGame::DetectHit() {
 	}
 }
 
+/// <summary>
+/// Change projectile type from PISTOL, ARTILLERY, FIREBALL, LASER OR ROCKET LAUNCHER
+/// </summary>
+/// <param name="bulletRounds">Number of particles to project</param>
+/// <param name="mass">The weight of the particle</param>
+/// <param name="velocity">The velocity of the particle</param>
+/// <param name="damping">Damping force</param>
+/// <param name="acceleration">The acceleration</param>
 void ArtilleryGame::ChangeProjectileType(unsigned int bulletRounds, float mass, Vector3 velocity, float damping, Vector3 acceleration) {
 	Clear();
 	ParticleManager particleManager;
@@ -343,6 +363,9 @@ void ArtilleryGame::ChangeProjectileType(unsigned int bulletRounds, float mass, 
 	}
 }
 
+/// <summary>
+/// Manual cleanup of m_Bullets objects
+/// </summary>
 void ArtilleryGame::Clear() {
 	if (m_Bullets.size() > 0) {
 		for (int i = 0; i < m_Bullets.size(); i++) {
