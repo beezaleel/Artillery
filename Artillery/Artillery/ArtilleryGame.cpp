@@ -199,10 +199,7 @@ void ArtilleryGame::GameUpdate()
 
 	if (shooting) {
 		for (int i = 0; i < m_Bullets.size(); i++) {
-			m_Bullets[i]->velocity += m_Bullets[i]->acceleration * 0.005f;
-			m_Bullets[i]->gameObject->Position =
-				m_Bullets[i]->gameObject->Position +
-				glm::vec3(m_Bullets[i]->velocity.x, m_Bullets[i]->velocity.y, m_Bullets[i]->velocity.z) * 0.005f;
+			m_Bullets[i]->Integrate(0.005f);
 
 			if (m_Bullets[i]->gameObject->Position.y <= 0.0f) {
 				DetectHit();
