@@ -14,7 +14,7 @@ Particle::~Particle() {
 
 void Particle::Integrate(float dt) {
 	velocity.addScaledVector(acceleration, dt);
-	//velocity *= damping;
+	velocity *= damping;
 	gameObject->Position = gameObject->Position + glm::vec3(velocity.x, velocity.y, velocity.z) * dt;
 }
 

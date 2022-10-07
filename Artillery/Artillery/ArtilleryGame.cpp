@@ -154,31 +154,31 @@ void ArtilleryGame::GameUpdate()
 	if (GDP_IsKeyPressed('1')) {
 		Vector3 velocity = Vector3(0.0f, 0.0f, 35.0f);
 		Vector3 acceleration = Vector3(0.0f, -1.f, 0.0f);
-		ChangeProjectileType(1, 2.0f, velocity, 0.99f, acceleration);
+		ChangeProjectileType(1, 2.0f, velocity, 1.0f, acceleration);
 		DisplayTextToUser("Changing projectile type to PISTOL...");
 	}
 	if (GDP_IsKeyPressed('2')) {
 		Vector3 velocity = Vector3(0.0f, 30.0f, 40.0f);
 		Vector3 acceleration = Vector3(0.0f, -1.5f, 0.0f);
-		ChangeProjectileType(1, 200.0f, velocity, 0.99f, acceleration);
+		ChangeProjectileType(1, 200.0f, velocity, 1.0f, acceleration);
 		DisplayTextToUser("Changing projectile type to ARTILLERY...");
 	}
 	if (GDP_IsKeyPressed('3')) {
 		Vector3 velocity = Vector3(0.0f, 0.0f, 10.0f);
 		Vector3 acceleration = Vector3(0.0f, -0.6f, 0.0f);
-		ChangeProjectileType(1, 1.0f, velocity, 0.9f, acceleration);
+		ChangeProjectileType(1, 1.0f, velocity, 1.0f, acceleration);
 		DisplayTextToUser("Changing projectile type to FIREBALL...");
 	}
 	if (GDP_IsKeyPressed('4')) {
 		Vector3 velocity = Vector3(0.0f, 0.0f, 100.0f);
 		Vector3 acceleration = Vector3(0.0f, -0.3f, 0.0f);
-		ChangeProjectileType(1, 0.1f, velocity, 0.99f, acceleration);
+		ChangeProjectileType(1, 0.1f, velocity, 1.0f, acceleration);
 		DisplayTextToUser("Changing projectile type to LASER...");
 	}
 	if (GDP_IsKeyPressed('5')) {
 		Vector3 velocity = Vector3(0.0f, 40.0f, 60.0f);
 		Vector3 acceleration = Vector3(0.0f, -0.8f, 0.0f);
-		ChangeProjectileType(1, 400.0f, velocity, 0.99f, acceleration);
+		ChangeProjectileType(1, 400.0f, velocity, 1.0f, acceleration);
 		DisplayTextToUser("Changing projectile type to ROCKET LAUNCHER...");
 	}
 	if (GDP_IsKeyPressed(' ')) {
@@ -186,7 +186,7 @@ void ArtilleryGame::GameUpdate()
 		if (m_Bullets.size() == 0) {
 			Vector3 velocity = Vector3(0.0f, 0.0f, 5.0f);
 			Vector3 acceleration = Vector3(0.0f, -0.981f, 0.0f);
-			ChangeProjectileType(1, 1, velocity, 0.99f, acceleration);
+			ChangeProjectileType(1, 1, velocity, 1.0f, acceleration);
 			DisplayTextToUser("Using default projectile...");
 		}
 		DEBUG_PRINT("Aimed coordinate is - (%.2f, %.2f, %.2f)\n", aimCoordinate.x, aimCoordinate.y, aimCoordinate.z);
