@@ -33,5 +33,5 @@ private:
 
 	GameObject* m_PlayerTank;
 	GameObject* m_EnemyTank;
-	std::vector<Particle*> multiple_Bullets;
+	std::vector<Particle*> m_Bullets;
 };
