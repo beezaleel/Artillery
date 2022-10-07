@@ -8,15 +8,17 @@ ParticleManager::~ParticleManager()
 {
 }
 
-Particle& ParticleManager::CreateParticle(Vector3& position) {
-	Particle particle;
+Particle* ParticleManager::CreateParticle(float mass, Vector3& velocity, float damping, Vector3& acceleration) {
+	Particle* particle = new Particle();
 
-	particle.position = position;
-	particle.acceleration = Vector3(0.0f, -9.8f, 0.0f);
-	particle.mass = 0.01f;
-	m_Particles.push_back(particle);
+	particle->mass = mass;
+	particle->velocity = velocity;
+	particle->damping = damping;
+	particle->acceleration = acceleration;
+	//m_Particles.push_back(particle);
 
-	return m_Particles[m_Particles.size() - 1];
+	//return m_Particles[m_Particles.size() - 1];
+	return particle;
 }
 
 void ParticleManager::Integrate(float duration) {

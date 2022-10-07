@@ -9,7 +9,7 @@ public:
 	ParticleManager();
 	~ParticleManager();
 
-	Particle& CreateParticle(Vector3& position);
+	Particle* CreateParticle(float mass, Vector3& velocity, float damping, Vector3& acceleration);
 	void Integrate(float duration);
 
 private:

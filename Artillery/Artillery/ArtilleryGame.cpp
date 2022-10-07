@@ -1,9 +1,11 @@
 #include "ArtilleryGame.h"
 #include "AssetInfo.h"
+#include "ParticleManager.h"
 #include <cstdlib>
 #include <ctime>
 #include <iostream>			// cout
 #include <math.h>
+#include <vector>
 
 #define DEBUG_LOG_ENABLED
 #ifdef DEBUG_LOG_ENABLED
@@ -38,7 +40,8 @@ unsigned int BulletMaterialId;
 ArtilleryGame::ArtilleryGame()
 	: m_PlayerTank(nullptr)
 	, m_EnemyTank(nullptr)
-	, m_Bullet(nullptr) 
+	, m_Bullet(nullptr)
+	, multiple_Bullets()
 {
 	DEBUG_PRINT("ArtilleryGame::ArtilleryGame\n");
 	// DO NOTHING!!!!!!!!
@@ -104,6 +107,10 @@ void ArtilleryGame::Destroy()
 	m_Bullet->gameObject->Renderer.ShaderId = 0;
 	m_Bullet->gameObject->Scale = { 0, 0, 0 };
 	delete m_Bullet;
+
+	Clear();
+	multiple_Bullets.resize(0);
+	multiple_Bullets.shrink_to_fit();
 }
 
 /// <summary>
@@ -160,42 +167,43 @@ void ArtilleryGame::GameUpdate()
 	}
 	
 	if (GDP_IsKeyPressed('1')) {
-		m_Bullet->mass = 2.0f;
-		m_Bullet->velocity = Vector3(0.0f, 0.0f, 15.0f);
-		m_Bullet->acceleration = Vector3(0.0f, -1.0f, 0.0f);
-		m_Bullet->damping = 0.99f;
+		Vector3 velocity = Vector3(0.0f, 0.0f, 35.0f);
+		Vector3 acceleration = Vector3(0.0f, -1.f, 0.0f);
+		ChangeProjectileType(1, 2.0f, velocity, 0.99f, acceleration);
 		DisplayTextToUser("Changing projectile type to PISTOL...");
 	}
 	if (GDP_IsKeyPressed('2')) {
-		m_Bullet->mass = 200.0f;
-		m_Bullet->velocity = Vector3(0.0f, 30.0f, 40.0f);
-		m_Bullet->acceleration = Vector3(0.0f, -20.0f, 0.0f);
-		m_Bullet->damping = 0.99f;
+		Vector3 velocity = Vector3(0.0f, 30.0f, 40.0f);
+		Vector3 acceleration = Vector3(0.0f, -1.5f, 0.0f);
+		ChangeProjectileType(1, 200.0f, velocity, 0.99f, acceleration);
 		DisplayTextToUser("Changing projectile type to ARTILLERY...");
 	}
 	if (GDP_IsKeyPressed('3')) {
-		m_Bullet->mass = 1.0f;
-		m_Bullet->velocity = Vector3(0.0f, 0.0f, 10.0f);
-		m_Bullet->acceleration = Vector3(0.0f, 0.6f, 0.0f);
-		m_Bullet->damping = 0.9f;
-		m_Bullet->scale += 50.0f;
+		Vector3 velocity = Vector3(0.0f, 0.0f, 10.0f);
+		Vector3 acceleration = Vector3(0.0f, -0.6f, 0.0f);
+		ChangeProjectileType(1, 1.0f, velocity, 0.9f, acceleration);
 		DisplayTextToUser("Changing projectile type to FIREBALL...");
 	}
 	if (GDP_IsKeyPressed('4')) {
-		m_Bullet->mass = 0.1f;
-		m_Bullet->velocity = Vector3(0.0f, 0.0f, 100.0f);
-		m_Bullet->acceleration = Vector3(0.0f, 0.0f, 0.0f);
-		m_Bullet->damping = 0.99f;
+		Vector3 velocity = Vector3(0.0f, 0.0f, 100.0f);
+		Vector3 acceleration = Vector3(0.0f, -0.3f, 0.0f);
+		ChangeProjectileType(1, 0.1f, velocity, 0.99f, acceleration);
 		DisplayTextToUser("Changing projectile type to LASER...");
 	}
 	if (GDP_IsKeyPressed('5')) {
-		m_Bullet->mass = 400.0f;
-		m_Bullet->velocity = Vector3(0.0f, 40.0f, 60.0f);
-		m_Bullet->acceleration = Vector3(0.0f, -30.0f, 0.0f);
-		m_Bullet->damping = 0.99f;
+		Vector3 velocity = Vector3(0.0f, 40.0f, 60.0f);
+		Vector3 acceleration = Vector3(0.0f, -0.8f, 0.0f);
+		ChangeProjectileType(1, 400.0f, velocity, 0.99f, acceleration);
 		DisplayTextToUser("Changing projectile type to ROCKET LAUNCHER...");
 	}
 	if (GDP_IsKeyPressed(' ')) {
+		// This means no projectile type was selected. Create default projectile.
+		if (multiple_Bullets.size() == 0) {
+			Vector3 velocity = Vector3(0.0f, 0.0f, 5.0f);
+			Vector3 acceleration = Vector3(0.0f, -0.981f, 0.0f);
+			ChangeProjectileType(1, 1, velocity, 0.99f, acceleration);
+			DisplayTextToUser("Using default projectile...");
+		}
 		DEBUG_PRINT("Aimed coordinate is - (%.2f, %.2f, %.2f)\n", aimCoordinate.x, aimCoordinate.y, aimCoordinate.z);
 		Shoot();
 	}
@@ -204,7 +212,7 @@ void ArtilleryGame::GameUpdate()
 		StartNewGame();
 	}
 
-	if (shooting) {
+	/*if (shooting) {
 		m_Bullet->velocity += m_Bullet->acceleration * 0.005f;
 		m_Bullet->gameObject->Position = 
 			m_Bullet->gameObject->Position + 
@@ -213,6 +221,19 @@ void ArtilleryGame::GameUpdate()
 		if (m_Bullet->gameObject->Position.y <= 0.0f) {
 			DetectHit();
 			shooting = false;
+		}
+	}*/
+	if (shooting) {
+		for (int i = 0; i < multiple_Bullets.size(); i++) {
+			multiple_Bullets[i]->velocity += multiple_Bullets[i]->acceleration * 0.005f;
+			multiple_Bullets[i]->gameObject->Position =
+				multiple_Bullets[i]->gameObject->Position +
+				glm::vec3(multiple_Bullets[i]->velocity.x, multiple_Bullets[i]->velocity.y, multiple_Bullets[i]->velocity.z) * 0.005f;
+
+			if (multiple_Bullets[i]->gameObject->Position.y <= 0.0f) {
+				DetectHit();
+				shooting = false;
+			}
 		}
 	}
 }
@@ -306,8 +327,13 @@ int ArtilleryGame::GenerateRandomNumber(int minLimit, int maxLimit) {
 }
 
 void ArtilleryGame::UpdateCoordinate(float x, float y, float z) {
-	aimCoordinate = glm::normalize(aimCoordinate + glm::vec3(x, y, z) * 0.01f);
-	m_Bullet->gameObject->Position = aimCoordinate;
+	/*aimCoordinate = glm::normalize(aimCoordinate + glm::vec3(x, y, z) * 0.01f);
+	m_Bullet->gameObject->Position = aimCoordinate;*/
+
+	for (int i = 0; i < multiple_Bullets.size(); i++) {
+		aimCoordinate = glm::normalize(aimCoordinate + glm::vec3(x, y, z) * 0.01f);
+		multiple_Bullets[i]->gameObject->Position = aimCoordinate;
+	}
 
 	DEBUG_PRINT("Aimed coordinates: (%.2f, %.2f, %.2f)\n", aimCoordinate.x, aimCoordinate.y, aimCoordinate.z);
 }
@@ -316,15 +342,33 @@ void ArtilleryGame::Shoot() {
 	if (shooting)
 		return;
 
-	m_Bullet->gameObject->Position = m_PlayerTank->Position + glm::vec3(0.0f, 1.0f, 0.0f);
+	/*m_Bullet->gameObject->Position = m_PlayerTank->Position + glm::vec3(0.0f, 1.0f, 0.0f);
 	m_Bullet->velocity = Vector3(aimCoordinate.x, aimCoordinate.y, aimCoordinate.z) * 6.0f;
-	m_Bullet->acceleration = Vector3(0.0f, -0.981f, 0.0f);
+	m_Bullet->acceleration = Vector3(0.0f, -0.981f, 0.0f);*/
+
+	for (int i = 0; i < multiple_Bullets.size(); i++) {
+		multiple_Bullets[i]->gameObject->Position = m_PlayerTank->Position + glm::vec3(0.0f, 1.0f, 0.0f);
+		multiple_Bullets[i]->velocity = Vector3(aimCoordinate.x, aimCoordinate.y, aimCoordinate.z) * 6.0f;
+		//multiple_Bullets[i]->acceleration = Vector3(0.0f, -0.981f, 0.0f);
+	}
 
 	shooting = true;
 }
 
 void ArtilleryGame::DetectHit() {
-	float distance = glm::distance(m_Bullet->gameObject->Position, m_EnemyTank->Position);
+	for (int i = 0; i < multiple_Bullets.size(); i++) {
+		float distance = glm::distance(multiple_Bullets[i]->gameObject->Position, m_EnemyTank->Position);
+		if (distance < 1.5f) {
+			DisplayTextToUser("Enemy eliminated!. Please press `n` to start a new game.\n");
+			gameOver = true;
+			return;
+		}
+		else
+		{
+			DEBUG_PRINT("Missed target by %d meters!\n", (int)distance);
+		}
+	}
+	/*float distance = glm::distance(m_Bullet->gameObject->Position, m_EnemyTank->Position);
 	if (distance < 1.5f) {
 		DisplayTextToUser("Enemy eliminated!. Please press `n` to start a new game.\n");
 		gameOver = true;
@@ -332,5 +376,29 @@ void ArtilleryGame::DetectHit() {
 	else
 	{
 		DEBUG_PRINT("Missed target by %d meters!\n", (int)distance);
+	}*/
+}
+
+void ArtilleryGame::ChangeProjectileType(unsigned int bulletRounds, float mass, Vector3 velocity, float damping, Vector3 acceleration) {
+	Clear();
+	ParticleManager particleManager;
+	multiple_Bullets.resize(bulletRounds);
+	for (int i = 0; i < multiple_Bullets.size(); i++) {
+		multiple_Bullets[i] = particleManager.CreateParticle(mass, velocity, damping, acceleration);
+		multiple_Bullets[i]->gameObject = CreateGameObjectByType("Bullet");
+	}
+}
+
+void ArtilleryGame::Clear() {
+	if (multiple_Bullets.size() > 0) {
+		for (int i = 0; i < multiple_Bullets.size(); i++) {
+			multiple_Bullets[i]->acceleration = { 0, 0, 0 };
+			multiple_Bullets[i]->gameObject->Position = { 0, 0, 0 };
+			multiple_Bullets[i]->gameObject->Renderer.MaterialId = 0;
+			multiple_Bullets[i]->gameObject->Renderer.MeshId = 0;
+			multiple_Bullets[i]->gameObject->Renderer.ShaderId = 0;
+			multiple_Bullets[i]->gameObject->Scale = { 0, 0, 0 };
+			multiple_Bullets[i]->velocity = { 0, 0, 0 };
+		}
 	}
 }

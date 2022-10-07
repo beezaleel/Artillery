@@ -2,6 +2,7 @@
 
 #include <gdp/Engine.h>
 #include <string>
+#include <vector>
 #include "Particle.h"
 
 using namespace gdp; 
@@ -25,8 +26,13 @@ private:
 	void UpdateCoordinate(float x, float y, float z);
 	void Shoot();
 	void DetectHit();
+	void ChangeProjectileType(unsigned int bulletRounds, 
+		float mass, Vector3 velocity, float damping, 
+		Vector3 acceleration);
+	void Clear();
 
 	GameObject* m_PlayerTank;
 	GameObject* m_EnemyTank;
 	Particle* m_Bullet;
+	std::vector<Particle*> multiple_Bullets;
 };
