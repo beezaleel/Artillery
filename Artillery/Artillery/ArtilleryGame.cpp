@@ -1,6 +1,7 @@
 #include "ArtilleryGame.h"
 #include "AssetInfo.h"
 #include "ParticleManager.h"
+#include "ParticleSystem.h"
 #include <cstdlib>
 #include <ctime>
 #include <iostream>			// cout
@@ -335,6 +336,25 @@ void ArtilleryGame::Shoot() {
 /// Detect if the bullet has hit target. Calculate distance between bullet and target.
 /// </summary>
 void ArtilleryGame::Collision() {
+	// I attempted Explosion with Particle system but didn't work.
+	/*ParticleSystem particleSystem;
+	particleSystem.GenerateParticles(100);
+
+	Vector3 up(m_Bullets[0]->position.x, m_Bullets[0]->position.y, m_Bullets[0]->position.z);
+
+	for (int i = 0; i < particleSystem.m_Particles.size(); i++) {
+		particleSystem.m_Particles[i].gameObject = CreateGameObjectByType("Bullet");
+	}
+
+	for (int i = 0; i < 10; i++) {
+		particleSystem.CreateParticle(up);
+	}
+
+	for (int i = 0; i < 10; i++) {
+		particleSystem.Integrate(0.1f);
+		particleSystem.PrintParticleInfo();
+	}*/
+
 	for (int i = 0; i < m_Bullets.size(); i++) {
 		float distance = glm::distance(m_Bullets[i]->gameObject->Position, m_EnemyTank->Position);
 		if (distance < 1.5f) {

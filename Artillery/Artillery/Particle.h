@@ -16,6 +16,7 @@ public:
 
 	float damping;
 	float mass;
+	float age;
 
 	void Integrate(float dt);
 	void PrintInfo();

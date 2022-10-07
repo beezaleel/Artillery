@@ -7,6 +7,7 @@ Particle::Particle() {
 	acceleration = 0.0f;
 	damping = 1.0f;
 	mass = 1.0f;
+	age = -1.0f;
 }
 
 Particle::~Particle() {
